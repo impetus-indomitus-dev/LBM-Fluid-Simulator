@@ -53,9 +53,11 @@ import matplotlib.pyplot  # matplotlib的画图库
 import tkinter.messagebox # 消息窗口
 import tkinter.filedialog # 文件选择器
 import tkinter.ttk as ttk # ttk美化
+import argparse           # 命令行参数解析
 from   numpy     import * # 计算库
 from   fileinput import filename # 方便文件读写
 from   matplotlib.backends.backend_tkagg import FigureCanvasTkAgg # matplotlib的Tkinter接口
+import locales # Localization support
 
 
 ############################
@@ -704,13 +706,13 @@ matplotlib.pyplot.connect('button_release_event', draw_released)
 
 ldFig = matplotlib.pyplot.figure(num=3, figsize=(10, 3))
 ax = ldFig.add_subplot(111)
-ax.set_xlabel(u'代数')
-ax.set_ylabel(u'力')
-ax.set_title(u'力-代数 曲线')
+ax.set_xlabel(locales.get_text("CHART_X_AXIS"))
+ax.set_ylabel(locales.get_text("CHART_Y_AXIS"))
+ax.set_title(locales.get_text("CHART_TITLE"))
 ax.xaxis.grid(True, which='major')
 ax.yaxis.grid(True, which='major')
-l1, = ax.plot(list_gen, list_lift, 'b', label=u'升力')
-l2, = ax.plot(list_gen, list_drag, 'r', label=u'阻力')
+l1, = ax.plot(list_gen, list_lift, 'b', label=locales.get_text("LIFT"))
+l2, = ax.plot(list_gen, list_drag, 'r', label=locales.get_text("DRAG"))
 handles, labels = ax.get_legend_handles_labels()
 ax.legend(handles[::-1], labels[::-1])
 
@@ -1615,65 +1617,7 @@ class Main_window(tkinter.Frame):
         self.bool_ld_auto_update.set(True)
 
         #菜单栏
-        self.menuBar = tkinter.Menu(root)
-        root.config(menu=self.menuBar)
-
-        self.menu_file = tkinter.Menu(self.menuBar, tearoff=0)
-        self.menuBar.add_cascade(label='文件',menu=self.menu_file)
-        self.menu_file.add_command(label='新建',command=self.Reset)
-        self.menu_file.add_command(label='打开',command=self.ChooseFile)
-        self.menu_file.add_command(label='保存',command=self.Export)
-        self.menu_file.add_separator()
-        self.menu_file.add_command(label='截图',command=lambda:self.SavePhotoStep2(''))
-        self.menu_file.add_command(label='截图为',command=self.SavePhoto)
-        self.menu_file.add_separator()
-        self.menu_file.add_command(label='退出',command=self.Exit)
-
-        self.menu_operation = tkinter.Menu(self.menuBar, tearoff=0)
-        self.menuBar.add_cascade(label='操作',menu=self.menu_operation)
-        self.menu_operation.add_command(label='开始',command=HelpStart)
-        self.menu_operation.add_command(label='暂停',command=HelpPause)
-        self.menu_operation.add_separator()
-        self.menu_operation.add_command(label='下一代',command=lambda:nextFrame(1))
-        self.menu_operation.add_command(label='下十代',command=lambda:nextFrame(10))
-        self.menu_operation.add_command(label='下百代',command=lambda:nextFrame(100))
-        self.menu_operation.add_command(label='下千代',command=lambda:nextFrame(1000))
-        self.menu_operation.add_separator()
-        self.menu_operation.add_command(label='重置参数',command=self.Reset)
-
-        self.menu_view = tkinter.Menu(self.menuBar, tearoff=0)
-        self.menuBar.add_cascade(label='查看',menu=self.menu_view)
-        self.menu_view.add_command(label='旋度动画',command=lambda:change_animation(0))
-        self.menu_view.add_command(label='密度动画',command=lambda:change_animation(1))
-        self.menu_view.add_command(label='流线',command=lambda:change_animation(2))
-        self.menu_view.add_command(label='速度矢量',command=lambda:change_animation(3))
-        self.menu_view.add_command(label='水平速度',command=lambda:change_animation(4))
-        self.menu_view.add_command(label='垂直速度',command=lambda:change_animation(5))
-        self.menu_view.add_separator()
-        self.menu_view.add_command(label='升力阻力-代数 图',command=self.LiftDragWindow)
-
-        self.menu_advanced = tkinter.Menu(self.menuBar, tearoff=0)
-        self.menuBar.add_cascade(label='高级',menu=self.menu_advanced)
-        self.menu_advanced.add_command(label='格子规格：50x70',command=lambda: self.ChangeLattice(50,75))
-        self.menu_advanced.add_command(label='格子规格：60x90',command=lambda: self.ChangeLattice(60,90))
-        self.menu_advanced.add_command(label='格子规格：80x120',command=lambda: self.ChangeLattice(80,120))
-        self.menu_advanced.add_command(label='格子规格：100x150',command=lambda: self.ChangeLattice(100,150))
-        self.menu_advanced.add_command(label='格子规格：160x240',command=lambda: self.ChangeLattice(160,240))
-        self.menu_advanced.add_command(label='格子规格：200x300',command=lambda: self.ChangeLattice(200,300))
-        self.menu_advanced.add_command(label='自定义格子规格',command=self.LatticeWindow)
-        self.menu_advanced.add_separator()
-        self.menu_advanced.add_command(label='反弹格式：风洞（上下反弹）', command=lambda: self.ChangeEdge(0))
-        self.menu_advanced.add_command(label='反弹格式：无反弹', command=lambda: self.ChangeEdge(1))
-        self.menu_advanced.add_command(label='反弹格式：三侧反弹', command=lambda: self.ChangeEdge(2))
-        self.menu_advanced.add_command(label='反弹格式：方腔流（全侧反弹）', command=lambda: self.ChangeEdge(3))
-
-        self.menu_about = tkinter.Menu(self.menuBar, tearoff=0)
-        self.menuBar.add_cascade(label='关于',menu=self.menu_about)
-        
-
-        self.menu_help = tkinter.Menu(self.menuBar, tearoff=0)
-        self.menuBar.add_cascade(label='帮助',menu=self.menu_help)
-
+        self.CreateMenu()        
 
         #框线
         self.layout_window = tkinter.Frame(root)
@@ -1687,7 +1631,7 @@ class Main_window(tkinter.Frame):
         self.layout_cnb = tkinter.Frame(self.layout_window)
         self.layout_cnb.grid(column=0, row=0)
 
-        self.layout_status = tkinter.LabelFrame(self.layout_cnb, text="基本信息",bd=1)
+        self.layout_status = tkinter.LabelFrame(self.layout_cnb, text=locales.get_text("FRAME_BASIC_INFO"),bd=1)
         self.layout_canvas = tkinter.Frame(self.layout_cnb)
         canvas = FigureCanvasTkAgg(theFig, self.layout_canvas)
         canvas.get_tk_widget().grid()
@@ -1719,22 +1663,22 @@ class Main_window(tkinter.Frame):
         except:
             traceback.print_exc()
 
-        self.frame_fluid = tkinter.LabelFrame(self.layout_snf, text="流动参数", width=300, height=100, bd=1)
+        self.frame_fluid = tkinter.LabelFrame(self.layout_snf, text=locales.get_text("FRAME_FLUID_PARAMS"), width=300, height=100, bd=1)
         self.frame_fluid.grid(column=0, row = 1)
 
-        self.frame_barrier = tkinter.LabelFrame(self.layout_snf, width=300, height=100, text="障碍参数", bd=1)
+        self.frame_barrier = tkinter.LabelFrame(self.layout_snf, width=300, height=100, text=locales.get_text("FRAME_BARRIER_PARAMS"), bd=1)
         self.frame_barrier.grid(column=0, row = 2)
 
-        self.frame_animation = tkinter.LabelFrame(self.layout_snf, width=300, height=100, text="动画参数", bd=1)
+        self.frame_animation = tkinter.LabelFrame(self.layout_snf, width=300, height=100, text=locales.get_text("FRAME_ANIMATION_PARAMS"), bd=1)
         self.frame_animation.grid(column=0, row = 3)
 
         #按钮
-        self.button_pause = ttk.Button(self.layout_button, text='暂停', command=HelpPause)
-        self.button_start = ttk.Button(self.layout_button, text='开始', command=HelpStart)
-        self.button_next20gen = ttk.Button(self.layout_button, text='下一帧', command=lambda: thread_it(nextFrame, 20))
-        self.button_reset = ttk.Button(self.layout_button, text='重置', command=self.Reset)
-        self.button_import = ttk.Button(self.layout_button, text='打开', command=self.ChooseFile)
-        self.button_export = ttk.Button(self.layout_button, text='保存', command=self.Export)
+        self.button_pause = ttk.Button(self.layout_button, text=locales.get_text("BTN_PAUSE"), command=HelpPause)
+        self.button_start = ttk.Button(self.layout_button, text=locales.get_text("BTN_START"), command=HelpStart)
+        self.button_next20gen = ttk.Button(self.layout_button, text=locales.get_text("BTN_NEXT_FRAME"), command=lambda: thread_it(nextFrame, 20))
+        self.button_reset = ttk.Button(self.layout_button, text=locales.get_text("BTN_RESET"), command=self.Reset)
+        self.button_import = ttk.Button(self.layout_button, text=locales.get_text("BTN_IMPORT"), command=self.ChooseFile)
+        self.button_export = ttk.Button(self.layout_button, text=locales.get_text("BTN_EXPORT"), command=self.Export)
         self.button_next20gen.grid(column=0, row=0)
         self.button_start.grid(column=1, row=0)
         self.button_reset.grid(column=2, row=0)
@@ -1742,24 +1686,24 @@ class Main_window(tkinter.Frame):
         self.button_export.grid(column=4, row=0)
         self.layout_button.grid(column=0, row=3)
 
-        self.button_equation = ttk.Button(self.frame_barrier, text='高级障碍', command=lambda:thread_it(self.HelpEquationWindow))
+        self.button_equation = ttk.Button(self.frame_barrier, text=locales.get_text("BTN_ADVANCED_BARRIER"), command=lambda:thread_it(self.HelpEquationWindow))
         self.button_equation.grid(column=1, row=1)
 
         #标签
-        self.label_u0 = tkinter.Label(self.frame_fluid, text="来流速度：")
+        self.label_u0 = tkinter.Label(self.frame_fluid, text=locales.get_text("LBL_INFLOW_VELOCITY"))
         self.label_u0.grid(column=0, row=0)
         self.label_var_u0 = tkinter.Label(self.frame_fluid, textvariable=self.text_u0)
         self.label_var_u0.grid(column=2, row=0)
-        self.label_viscosity = tkinter.Label(self.frame_fluid, text="粘性系数：")
+        self.label_viscosity = tkinter.Label(self.frame_fluid, text=locales.get_text("LBL_VISCOSITY"))
         self.label_viscosity.grid(column=0, row=1)
         self.label_var_viscosity = tkinter.Label(self.frame_fluid, textvariable=self.text_viscosity)
         self.label_var_viscosity.grid(column=2, row=1)
-        self.label_barrier = tkinter.Label(self.frame_barrier, text="障碍预设：")
+        self.label_barrier = tkinter.Label(self.frame_barrier, text=locales.get_text("LBL_BARRIER_PRESET"))
         self.label_barrier.grid(column=0, row=0)
 
-        self.label_animation_type = tkinter.Label(self.frame_animation, text="动画类型：")
-        self.label_animation_speed = tkinter.Label(self.frame_animation, text="动画速度：")
-        self.label_animation_contrast = tkinter.Label(self.frame_animation, text="对比程度：")
+        self.label_animation_type = tkinter.Label(self.frame_animation, text=locales.get_text("LBL_ANIMATION_TYPE"))
+        self.label_animation_speed = tkinter.Label(self.frame_animation, text=locales.get_text("LBL_ANIMATION_SPEED"))
+        self.label_animation_contrast = tkinter.Label(self.frame_animation, text=locales.get_text("LBL_CONTRAST"))
         self.label_animation_type.grid(column=0, row=0)
         self.label_animation_speed.grid(column=0, row=1)
         self.label_animation_contrast.grid(column=0, row=2)
@@ -1806,7 +1750,7 @@ class Main_window(tkinter.Frame):
         self.combo_animation_type.grid(column=1, row=0, columnspan=2)
 
         #勾选框
-        self.check_changeable_barrier = ttk.Checkbutton(self.frame_barrier, text="可变障碍", variable=self.bool_changeable_barrier, onvalue=True, offvalue=False)
+        self.check_changeable_barrier = ttk.Checkbutton(self.frame_barrier, text=locales.get_text("CHK_CHANGEABLE_BARRIER"), variable=self.bool_changeable_barrier, onvalue=True, offvalue=False)
         self.check_changeable_barrier.grid(column=1, row=2)
     
     able_lattice = True
@@ -1820,7 +1764,7 @@ class Main_window(tkinter.Frame):
                 self.Reset()
                 self.able_lattice = True
             else:
-                tkinter.messagebox.askretrycancel("请输入符合要求的数值", "输入范围限制在[50,999]，仅数字")
+                tkinter.messagebox.askretrycancel(locales.get_text("MSG_INVALID_INPUT_TITLE"), locales.get_text("MSG_INVALID_INPUT_BODY"))
                 self.lattice_window.attributes("-topmost",1)
 
     able_edge = True
@@ -1989,12 +1933,12 @@ class Main_window(tkinter.Frame):
             Labal_y = tkinter.Label(self.Equation_window, text="y(t) =")
             Labal_y.grid(row=1, column=0)
 
-            Labal_t = tkinter.Label(self.frame_eq_t ,text="t的起始值:")
+            Labal_t = tkinter.Label(self.frame_eq_t ,text=locales.get_text("LBL_T_START"))
             Labal_t.grid(row=0, column=0)
-            Labal_te = tkinter.Label(self.frame_eq_t, text="t的终止值:")
+            Labal_te = tkinter.Label(self.frame_eq_t, text=locales.get_text("LBL_T_END"))
             Labal_te.grid(row=0, column=2)
 
-            Labal_ex = tkinter.Label(self.frame_eq_t, text="计算精度：")
+            Labal_ex = tkinter.Label(self.frame_eq_t, text=locales.get_text("LBL_CALC_PRECISION"))
             Labal_ex.grid(row=0, column=4)
 
             in_xt = tkinter.StringVar()
@@ -2025,13 +1969,13 @@ class Main_window(tkinter.Frame):
             canvaseq = FigureCanvasTkAgg(eqFig, self.Equation_window)
             canvaseq.get_tk_widget().grid(row=3, column=0, columnspan=2)
 
-            EqButton_Confirm = ttk.Button(self.Equation_window, text='确定',
+            EqButton_Confirm = ttk.Button(self.Equation_window, text=locales.get_text("BTN_CONFIRM"),
                                             command=lambda: thread_it(Equation, Entry_x.get(), Entry_y.get(),
                                                                         Entry_t.get(),
                                                                         Entry_te.get(), Entry_ex.get()))
             EqButton_Confirm.grid(row=0, column=3)
 
-            Default_Confirm = ttk.Button(self.frame_eq_t, text='默认参数',
+            Default_Confirm = ttk.Button(self.frame_eq_t, text=locales.get_text("BTN_DEFAULT_PARAMS"),
                                             command=lambda: thread_it(Equation, Entry_x.get(), Entry_y.get(),
                                                                         Entry_t.get(),
                                                                         Entry_te.get(), Entry_ex.get()))
@@ -2059,21 +2003,21 @@ class Main_window(tkinter.Frame):
             self.eq_frame_tool = tkinter.Frame(self.Equation_window)
             self.eq_frame_tool.grid(column=0, row=6, columnspan=3)
 
-            self.eq_check_autoupdate = ttk.Checkbutton(self.eq_frame_tool, text="自动更新", variable=self.bool_auto_update, onvalue=True, offvalue=False, command=self.equation_window.AutoConfirm)
+            self.eq_check_autoupdate = ttk.Checkbutton(self.eq_frame_tool, text=locales.get_text("CHK_AUTO_UPDATE"), variable=self.bool_auto_update, onvalue=True, offvalue=False, command=self.equation_window.AutoConfirm)
             self.eq_check_autoupdate.grid(row=0, column=0)
 
-            self.eq_button_pen = ttk.Button(self.eq_frame_tool, text='鼠标：绘制',
+            self.eq_button_pen = ttk.Button(self.eq_frame_tool, text=locales.get_text("BTN_MOUSE_DRAW"),
                                             command=self.equation_window.PenEraser)
             self.eq_button_pen.grid(row=0, column=1)
 
-            self.eq_button_eraser = ttk.Button(self.eq_frame_tool, text='鼠标：擦除',
+            self.eq_button_eraser = ttk.Button(self.eq_frame_tool, text=locales.get_text("BTN_MOUSE_ERASE"),
                                             command=self.equation_window.PenEraser)
 
-            self.eq_button_clear = ttk.Button(self.eq_frame_tool, text='清除障碍',
+            self.eq_button_clear = ttk.Button(self.eq_frame_tool, text=locales.get_text("BTN_CLEAR_BARRIER"),
                                             command=lambda:thread_it(main_window.equation_window.ClearBarrier))
             self.eq_button_clear.grid(row=0, column=2)
 
-            self.eq_button_update = ttk.Button(self.eq_frame_tool, text='更新障碍',
+            self.eq_button_update = ttk.Button(self.eq_frame_tool, text=locales.get_text("BTN_UPDATE_BARRIER"),
                                             command=freshbarrier)
             self.eq_button_update.grid(row=0, column=3)
 
@@ -2084,11 +2028,10 @@ class Main_window(tkinter.Frame):
         self.ld_window.resizable(width=False, height=False)
         self.ld_window.protocol("WM_DELETE_WINDOW", self.ld_Window.closeEvent)
 
-        self.ld_button_fresh = ttk.Button(self.ld_window, text="清除曲线", command=self.ld_Window.Clear)
+        self.ld_button_fresh = ttk.Button(self.ld_window, text=locales.get_text("BTN_CLEAR_CURVE"), command=self.ld_Window.Clear)
         self.ld_button_fresh.grid(column=4, row=1)
 
-        self.ld_check_auto = ttk.Checkbutton(self.ld_window, text="自动刷新曲线", variable=self.bool_ld_auto_update\
-                                            , onvalue=True, offvalue=False, command=self.ld_Window.Switch)
+        self.ld_check_auto = ttk.Checkbutton(self.ld_window, text=locales.get_text("CHK_AUTO_UPDATE_CURVE"), variable=self.bool_ld_auto_update, onvalue=True, offvalue=False, command=self.ld_Window.Switch)
         self.ld_check_auto.grid(column=3, row=1)
 
         canvasld = FigureCanvasTkAgg(ldFig, self.ld_window)
@@ -2098,9 +2041,9 @@ class Main_window(tkinter.Frame):
         self.lattice_window = tkinter.Toplevel(root)
         self.lattice_window.resizable(width=False, height=False)
 
-        self.lattice_label_height = tkinter.Label(self.lattice_window, text="格子高度：")
+        self.lattice_label_height = tkinter.Label(self.lattice_window, text=locales.get_text("LBL_LATTICE_HEIGHT"))
         self.lattice_label_height.grid(column=0, row=0)
-        self.lattice_label_width = tkinter.Label(self.lattice_window, text="格子宽度：")
+        self.lattice_label_width = tkinter.Label(self.lattice_window, text=locales.get_text("LBL_LATTICE_WIDTH"))
         self.lattice_label_width.grid(column=0, row=1)
 
         self.str_lattice_height = tkinter.StringVar()
@@ -2111,10 +2054,10 @@ class Main_window(tkinter.Frame):
         self.lattice_line_width = tkinter.Entry(self.lattice_window, textvariable=self.str_lattice_width)
         self.lattice_line_width.grid(column=1, row=1)
 
-        self.lattice_button_cancel = ttk.Button(self.lattice_window, text="取消", command=self.Destroy_lattice)
+        self.lattice_button_cancel = ttk.Button(self.lattice_window, text=locales.get_text("BTN_CANCEL"), command=self.Destroy_lattice)
         self.lattice_button_cancel.grid(column=0, row=2)
 
-        self.lattice_button_confirm = ttk.Button(self.lattice_window, text="确定", command=self.LatticeConfirm)
+        self.lattice_button_confirm = ttk.Button(self.lattice_window, text=locales.get_text("BTN_CONFIRM"), command=self.LatticeConfirm)
         self.lattice_button_confirm.grid(column=1, row=2)
 
     def Destroy_lattice(self):
@@ -2124,7 +2067,7 @@ class Main_window(tkinter.Frame):
         try:
             self.ChangeLattice(int(self.str_lattice_height.get()), int(self.str_lattice_width.get()))
         except ValueError:
-            tkinter.messagebox.askretrycancel("请输入符合要求的数值", "输入范围限制在[50,999]，仅数字")
+            tkinter.messagebox.askretrycancel(locales.get_text("MSG_INVALID_INPUT_TITLE"), locales.get_text("MSG_INVALID_INPUT_BODY"))
             self.lattice_window.attributes("-topmost",1)
 
     def Destroy_ld(self):
@@ -2136,6 +2079,121 @@ class Main_window(tkinter.Frame):
 
     def Draw_eq(self):
         canvaseq.draw()
+
+    def ChangeLanguage(self, lang):
+        locales.set_language(lang)
+        self.UpdateText()
+        
+    def CreateMenu(self):
+        self.menuBar = tkinter.Menu(root)
+        root.config(menu=self.menuBar)
+
+        self.menu_file = tkinter.Menu(self.menuBar, tearoff=0)
+        self.menuBar.add_cascade(label=locales.get_text("MENU_FILE"), menu=self.menu_file)
+        self.menu_file.add_command(label=locales.get_text("MENU_NEW"), command=self.Reset)
+        self.menu_file.add_command(label=locales.get_text("MENU_OPEN"), command=self.ChooseFile)
+        self.menu_file.add_command(label=locales.get_text("MENU_SAVE"), command=self.Export)
+        self.menu_file.add_separator()
+        self.menu_file.add_command(label=locales.get_text("MENU_SCREENSHOT"), command=lambda:self.SavePhotoStep2(''))
+        self.menu_file.add_command(label=locales.get_text("MENU_SCREENSHOT_AS"), command=self.SavePhoto)
+        self.menu_file.add_separator()
+        self.menu_file.add_command(label=locales.get_text("MENU_EXIT"), command=self.Exit)
+
+        self.menu_operation = tkinter.Menu(self.menuBar, tearoff=0)
+        self.menuBar.add_cascade(label=locales.get_text("MENU_OPERATION"), menu=self.menu_operation)
+        self.menu_operation.add_command(label=locales.get_text("MENU_START"), command=HelpStart)
+        self.menu_operation.add_command(label=locales.get_text("MENU_PAUSE"), command=HelpPause)
+        self.menu_operation.add_separator()
+        self.menu_operation.add_command(label=locales.get_text("MENU_NEXT_GEN"), command=lambda:nextFrame(1))
+        self.menu_operation.add_command(label=locales.get_text("MENU_NEXT_10_GEN"), command=lambda:nextFrame(10))
+        self.menu_operation.add_command(label=locales.get_text("MENU_NEXT_100_GEN"), command=lambda:nextFrame(100))
+        self.menu_operation.add_command(label=locales.get_text("MENU_NEXT_1000_GEN"), command=lambda:nextFrame(1000))
+        self.menu_operation.add_separator()
+        self.menu_operation.add_command(label=locales.get_text("MENU_RESET_PARAMS"), command=self.Reset)
+
+        self.menu_view = tkinter.Menu(self.menuBar, tearoff=0)
+        self.menuBar.add_cascade(label=locales.get_text("MENU_VIEW"), menu=self.menu_view)
+        # Note: Dynamic bindings in menu commands might be tricky if variables change, but here they seem fine.
+        self.menu_view.add_command(label=locales.get_text("MENU_ANIM_CURL"), command=lambda:change_animation(0))
+        self.menu_view.add_command(label=locales.get_text("MENU_ANIM_DENSITY"), command=lambda:change_animation(1))
+        self.menu_view.add_command(label=locales.get_text("MENU_ANIM_STREAMLINE"), command=lambda:change_animation(2))
+        self.menu_view.add_command(label=locales.get_text("MENU_ANIM_VELOCITY_VECTOR"), command=lambda:change_animation(3))
+        self.menu_view.add_command(label=locales.get_text("MENU_ANIM_HORIZONTAL_VELOCITY"), command=lambda:change_animation(4))
+        self.menu_view.add_command(label=locales.get_text("MENU_ANIM_VERTICAL_VELOCITY"), command=lambda:change_animation(5))
+        self.menu_view.add_separator()
+        self.menu_view.add_command(label=locales.get_text("MENU_CHART_LIFT_DRAG"), command=self.LiftDragWindow)
+
+        self.menu_advanced = tkinter.Menu(self.menuBar, tearoff=0)
+        self.menuBar.add_cascade(label=locales.get_text("MENU_ADVANCED"), menu=self.menu_advanced)
+        self.menu_advanced.add_command(label=locales.get_text("MENU_LATTICE_FMT").format(50,75),command=lambda: self.ChangeLattice(50,75))
+        self.menu_advanced.add_command(label=locales.get_text("MENU_LATTICE_FMT").format(60,90),command=lambda: self.ChangeLattice(60,90))
+        self.menu_advanced.add_command(label=locales.get_text("MENU_LATTICE_FMT").format(80,120),command=lambda: self.ChangeLattice(80,120))
+        self.menu_advanced.add_command(label=locales.get_text("MENU_LATTICE_FMT").format(100,150),command=lambda: self.ChangeLattice(100,150))
+        self.menu_advanced.add_command(label=locales.get_text("MENU_LATTICE_FMT").format(160,240),command=lambda: self.ChangeLattice(160,240))
+        self.menu_advanced.add_command(label=locales.get_text("MENU_LATTICE_FMT").format(200,300),command=lambda: self.ChangeLattice(200,300))
+        self.menu_advanced.add_command(label=locales.get_text("MENU_CUSTOM_LATTICE"),command=self.LatticeWindow)
+        self.menu_advanced.add_separator()
+        self.menu_advanced.add_command(label=locales.get_text("MENU_BOUNCE_WIND_TUNNEL"), command=lambda: self.ChangeEdge(0))
+        self.menu_advanced.add_command(label=locales.get_text("MENU_BOUNCE_NO"), command=lambda: self.ChangeEdge(1))
+        self.menu_advanced.add_command(label=locales.get_text("MENU_BOUNCE_THREE_SIDE"), command=lambda: self.ChangeEdge(2))
+        self.menu_advanced.add_command(label=locales.get_text("MENU_BOUNCE_CAVITY"), command=lambda: self.ChangeEdge(3))
+
+        self.menu_about = tkinter.Menu(self.menuBar, tearoff=0)
+        self.menuBar.add_cascade(label=locales.get_text("MENU_ABOUT"),menu=self.menu_about)
+        
+
+        self.menu_help = tkinter.Menu(self.menuBar, tearoff=0)
+        self.menuBar.add_cascade(label=locales.get_text("MENU_HELP"),menu=self.menu_help)
+
+        self.menu_lang = tkinter.Menu(self.menuBar, tearoff=0)
+        self.menuBar.add_cascade(label=locales.get_text("MENU_LANGUAGE"), menu=self.menu_lang)
+        self.menu_lang.add_command(label=locales.get_text("MENU_LANG_ZH"), command=lambda: self.ChangeLanguage("zh"))
+        self.menu_lang.add_command(label=locales.get_text("MENU_LANG_EN"), command=lambda: self.ChangeLanguage("en"))
+        self.menu_lang.add_command(label=locales.get_text("MENU_LANG_ES"), command=lambda: self.ChangeLanguage("es"))
+
+    def UpdateText(self):
+        # Update Menu Bar title (index 4 is Language menu we added)
+        try:
+            self.CreateMenu()
+        except:
+            pass
+
+        # Frames
+        self.layout_status.config(text=locales.get_text("FRAME_BASIC_INFO"))
+        self.frame_fluid.config(text=locales.get_text("FRAME_FLUID_PARAMS"))
+        self.frame_barrier.config(text=locales.get_text("FRAME_BARRIER_PARAMS"))
+        self.frame_animation.config(text=locales.get_text("FRAME_ANIMATION_PARAMS"))
+        
+        # Buttons
+        self.button_pause.config(text=locales.get_text("BTN_PAUSE"))
+        self.button_start.config(text=locales.get_text("BTN_START"))
+        self.button_next20gen.config(text=locales.get_text("BTN_NEXT_FRAME"))
+        self.button_reset.config(text=locales.get_text("BTN_RESET"))
+        self.button_import.config(text=locales.get_text("BTN_IMPORT"))
+        self.button_export.config(text=locales.get_text("BTN_EXPORT"))
+        self.button_equation.config(text=locales.get_text("BTN_ADVANCED_BARRIER"))
+        
+        # Labels
+        self.label_u0.config(text=locales.get_text("LBL_INFLOW_VELOCITY"))
+        self.label_viscosity.config(text=locales.get_text("LBL_VISCOSITY"))
+        self.label_barrier.config(text=locales.get_text("LBL_BARRIER_PRESET"))
+        self.label_animation_type.config(text=locales.get_text("LBL_ANIMATION_TYPE"))
+        self.label_animation_speed.config(text=locales.get_text("LBL_ANIMATION_SPEED"))
+        self.label_animation_contrast.config(text=locales.get_text("LBL_CONTRAST"))
+        
+        # Checkbox
+        self.check_changeable_barrier.config(text=locales.get_text("CHK_CHANGEABLE_BARRIER"))
+
+        # Update Chart
+        try:
+            ax.set_xlabel(locales.get_text("CHART_X_AXIS"))
+            ax.set_ylabel(locales.get_text("CHART_Y_AXIS"))
+            ax.set_title(locales.get_text("CHART_TITLE"))
+            l1.set_label(locales.get_text("LIFT"))
+            l2.set_label(locales.get_text("DRAG"))
+            ax.legend([l1, l2], [locales.get_text("LIFT"), locales.get_text("DRAG")])
+        except:
+            traceback.print_exc()
 
     def Reset(self):
         global start_start, animating
@@ -2260,13 +2318,13 @@ class Main_window(tkinter.Frame):
 
         ldFig = matplotlib.pyplot.figure(num=3, figsize=(10, 3))
         ax = ldFig.add_subplot(111)
-        ax.set_xlabel(u'代数')
-        ax.set_ylabel(u'力')
-        ax.set_title(u'力-代数 曲线')
+        ax.set_xlabel(locales.get_text("CHART_X_AXIS"))
+        ax.set_ylabel(locales.get_text("CHART_Y_AXIS"))
+        ax.set_title(locales.get_text("CHART_TITLE"))
         ax.xaxis.grid(True, which='major')
         ax.yaxis.grid(True, which='major')
-        l1, = ax.plot(list_gen, list_lift, 'b', label=u'升力')
-        l2, = ax.plot(list_gen, list_drag, 'r', label=u'阻力')
+        l1, = ax.plot(list_gen, list_lift, 'b', label=locales.get_text("LIFT"))
+        l2, = ax.plot(list_gen, list_drag, 'r', label=locales.get_text("DRAG"))
         handles, labels = ax.get_legend_handles_labels()
         ax.legend(handles[::-1], labels[::-1])
 
@@ -2442,11 +2500,11 @@ class Ld_window():
         pass
 
     def Draw(self):
-        ax.set_xlabel(u'代数')
-        ax.set_ylabel(u'力')
-        ax.set_title(u'力-代数 曲线')
-        l1, = ax.plot(list_gen, list_lift, 'b', label=u'升力')
-        l2, = ax.plot(list_gen, list_drag, 'r', label=u'阻力')
+        ax.set_xlabel(locales.get_text("CHART_X_AXIS"))
+        ax.set_ylabel(locales.get_text("CHART_Y_AXIS"))
+        ax.set_title(locales.get_text("CHART_TITLE"))
+        l1, = ax.plot(list_gen, list_lift, 'b', label=locales.get_text("LIFT"))
+        l2, = ax.plot(list_gen, list_drag, 'r', label=locales.get_text("DRAG"))
         canvasld.draw()
     
     def Switch(self):
@@ -2458,13 +2516,13 @@ class Ld_window():
     
     def Clear(self):
         ax.cla()
-        ax.set_xlabel(u'代数')
-        ax.set_ylabel(u'力')
-        ax.set_title(u'力-代数 曲线')
+        ax.set_xlabel(locales.get_text("CHART_X_AXIS"))
+        ax.set_ylabel(locales.get_text("CHART_Y_AXIS"))
+        ax.set_title(locales.get_text("CHART_TITLE"))
         ax.xaxis.grid(True, which='major')
         ax.yaxis.grid(True, which='major')
-        l1, = ax.plot(list_gen, list_lift, 'b', label=u'升力')
-        l2, = ax.plot(list_gen, list_drag, 'r', label=u'阻力')
+        l1, = ax.plot(list_gen, list_lift, 'b', label=locales.get_text("LIFT"))
+        l2, = ax.plot(list_gen, list_drag, 'r', label=locales.get_text("DRAG"))
         handles, labels = ax.get_legend_handles_labels()
         ax.legend(handles[::-1], labels[::-1])
     
@@ -2474,10 +2532,17 @@ class Ld_window():
         main_window.Destroy_ld()
 
 
-threadAnimation = threading.Thread(target=starter, name='T_Animation')  # 动画开始线程
-threadAnimation.start()
-root = tkinter.Tk()
-main_window = Main_window(root)
-main_window.Draw()
-thread_it(fresh_status)
-main_window.mainloop()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='LBM Fluid Simulator')
+    parser.add_argument('--lang', '-l', type=str, default=None, help='Initial language (zh, en, es)')
+    args, unknown = parser.parse_known_args()
+    if args.lang:
+        locales.set_language(args.lang)
+
+    threadAnimation = threading.Thread(target=starter, name='T_Animation')  # 动画开始线程
+    threadAnimation.start()
+    root = tkinter.Tk()
+    main_window = Main_window(root)
+    main_window.Draw()
+    thread_it(fresh_status)
+    main_window.mainloop()
